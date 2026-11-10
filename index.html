@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>META - Gestión de Contratistas y Accesos</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+    <!-- Topbar / Header -->
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 text-white font-bold p-2 rounded-lg text-xl tracking-wider">META</div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">Mexicana de Técnicos en Autopistas</h1>
+                    <p class="text-xs text-slate-400">Sistema de Control y Gestión de Contratistas</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-right hidden sm:block">
+                    <p class="text-sm font-medium text-slate-200">Ing. Paulina Tellez</p>
+                    <p class="text-xs text-blue-400">Supervisora de Seguridad y Salud en el Trabajo</p>
+                </div>
+                <div class="bg-blue-500/20 p-2 rounded-full border border-blue-500/30">
+                    <i class="fa-solid fa-shield-halved text-blue-400"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-white border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 flex space-x-1 overflow-x-auto">
+            <button onclick="switchTab('contratista')" id="btn-contratista" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-blue-600 text-blue-600 flex items-center space-x-2 whitespace-nowrap">
+                <i class="fa-solid fa-building"></i> <span>Portal del Contratista</span>
+            </button>
+            <button onclick="switchTab('admin')" id="btn-admin" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center space-x-2 whitespace-nowrap">
+                <i class="fa-solid fa-square-check"></i> <span>Validación HSE & Admin</span>
+            </button>
+            <button onclick="switchTab('credenciales')" id="btn-credenciales" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center space-x-2 whitespace-nowrap">
+                <i class="fa-solid fa-id-card"></i> <span>Credenciales & QR</span>
+            </button>
+            <button onclick="switchTab('caseta')" id="btn-caseta" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center space-x-2 whitespace-nowrap">
+                <i class="fa-solid fa-person-walking-arrow-right"></i> <span>Caseta (Control Acceso)</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+
+        <!-- TAB 1: PORTAL DEL CONTRATISTA -->
+        <section id="tab-contratista" class="space-y-6">
+            <div class="bg-gradient-to-r from-blue-900 to-slate-900 text-white p-6 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold">Registro y Alta de Contratista</h2>
+                    <p class="text-slate-300 text-sm mt-1">Complete la información fiscal, pólizas, listado de personal, unidades y formatos de seguridad exigidos por META.</p>
+                </div>
+                <div class="bg-blue-600/30 border border-blue-400/30 px-4 py-2 rounded-xl text-sm">
+                    Estatus: <span id="badge-estatus" class="font-bold text-amber-400">En revisión</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Datos Fiscales -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center"><i class="fa-solid fa-file-invoice-dollar text-blue-600 mr-2"></i> 1. Datos Fiscales y Pólizas</h3>
+                        <form id="form-contratista" onsubmit="guardarContratista(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Razón Social</label>
+                                <input type="text" id="razon_social" required placeholder="Ej. Constructora Vial del Centro S.A. de C.V." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">RFC</label>
+                                <input type="text" id="rfc" required placeholder="CVC120304AB1" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Constancia de Situación Fiscal (PDF)</label>
+                                <input type="file" id="doc_fiscal" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Póliza de Seguros RC (Vigencia)</label>
+                                <input type="date" id="vigencia_seguro_empresa" class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div class="sm:col-span-2 flex justify-end mt-2">
+                                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition">Guardar Datos Generales</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Listado de Trabajadores -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-slate-900 flex items-center"><i class="fa-solid fa-users text-blue-600 mr-2"></i> 2. Listado de Trabajadores</h3>
+                            <button onclick="abrirModalTrabajador()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-2 rounded-lg transition"><i class="fa-solid fa-user-plus mr-1"></i> Agregar Trabajador</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-100 text-slate-600 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3 rounded-l-lg">Nombre</th>
+                                        <th class="p-3">NSS</th>
+                                        <th class="p-3">Puesto</th>
+                                        <th class="p-3">Estatus IMSS</th>
+                                        <th class="p-3 rounded-r-lg text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-trabajadores-body" class="divide-y divide-slate-100">
+                                    <tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Sin trabajadores registrados.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen Lateral -->
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="text-md font-bold text-slate-900 mb-3">Resumen de Requisitos HSE</h3>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex items-center justify-between">
+                                <span class="text-slate-600">Datos Fiscales</span>
+                                <span class="bg-emerald-100 text-emerald-700 text-xs px-2 py-0.5 rounded-full font-semibold">Completo</span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span class="text-slate-600">Lista de Personal</span>
+                                <span id="resumen-total-personal" class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-semibold">0 reg.</span>
+                            </li>
+                        </ul>
+                        <div class="mt-6 pt-4 border-t border-slate-100">
+                            <button onclick="enviarRevision()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition">Enviar a Revisión HSE</button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 border border-blue-200 p-4 rounded-2xl text-xs text-blue-900 leading-relaxed">
+                        <p class="font-bold mb-1 flex items-center"><i class="fa-solid fa-circle-info mr-1.5 text-blue-600"></i> Supervisión</p>
+                        Revisado y autorizado por la <strong>Ing. Paulina Tellez</strong> (Supervisora de Seguridad y Salud en el Trabajo).
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: VALIDACIÓN ADMIN & HSE -->
+        <section id="tab-admin" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Panel de Autorización - Ing. Paulina Tellez</h2>
+                        <p class="text-xs text-slate-500">Autorización de contratistas para habilitar credenciales de acceso.</p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-100 text-slate-600 uppercase text-xs">
+                            <tr>
+                                <th class="p-3 rounded-l-lg">Contratista</th>
+                                <th class="p-3">RFC</th>
+                                <th class="p-3">Personal</th>
+                                <th class="p-3">Estatus</th>
+                                <th class="p-3 rounded-r-lg text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr>
+                                <td class="p-3 font-semibold text-slate-800" id="admin-razon-social">Constructora Vial del Centro S.A. de C.V.</td>
+                                <td class="p-3 text-slate-600" id="admin-rfc">CVC120304AB1</td>
+                                <td class="p-3" id="admin-total-personal">0 trabajadores</td>
+                                <td class="p-3"><span id="admin-badge" class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-xs font-semibold">Pendiente Revisión</span></td>
+                                <td class="p-3 text-center space-x-1">
+                                    <button onclick="aprobarContratista()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">Aprobar</button>
+                                    <button onclick="rechazarContratista()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">Rechazar</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: CREDENCIALES Y QR -->
+        <section id="tab-credenciales" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-6">Credenciales Virtuales con Código QR</h2>
+                <div id="contenedor-credenciales" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="text-slate-400 text-sm italic col-span-full py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                        Las credenciales se habilitarán una vez que la empresa sea aprobada por la Ing. Paulina Tellez y tenga personal registrado.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: CASETA -->
+        <section id="tab-caseta" class="hidden space-y-6">
+            <div class="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow-sm border border-slate-200 text-center space-y-4">
+                <h2 class="text-xl font-bold text-slate-900">Control de Asistencia y Acceso</h2>
+                <p class="text-xs text-slate-500">Simulación del escáner de caseta para validar el código QR del trabajador.</p>
+                <div class="flex space-x-2">
+                    <input type="text" id="input-qr-token" placeholder="Seleccione un trabajador desde Credenciales..." readonly class="w-full border border-slate-300 rounded-xl p-2.5 text-sm bg-slate-50 outline-none">
+                    <button onclick="escanearQR()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition">Validar</button>
+                </div>
+                <div id="resultado-escaneo" class="hidden mt-6 p-6 rounded-2xl border text-left"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL TRABAJADOR -->
+    <div id="modal-trabajador" class="fixed inset-0 bg-slate-900/50 hidden justify-center items-center z-50 p-4">
+        <div class="bg-white max-w-md w-full p-6 rounded-2xl shadow-xl space-y-4">
+            <h3 class="text-lg font-bold text-slate-900">Registrar Trabajador</h3>
+            <form id="form-trabajador" onsubmit="guardarTrabajador(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nombre Completo</label>
+                    <input type="text" id="t_nombre" required class="w-full border border-slate-300 rounded-lg p-2 text-sm outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">NSS</label>
+                    <input type="text" id="t_nss" required placeholder="12345678901" class="w-full border border-slate-300 rounded-lg p-2 text-sm outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Puesto</label>
+                    <input type="text" id="t_puesto" required placeholder="Ej. Soldador" class="w-full border border-slate-300 rounded-lg p-2 text-sm outline-none">
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="cerrarModalTrabajador()" class="bg-slate-200 px-4 py-2 rounded-xl text-xs font-semibold">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-semibold">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script de control -->
+    <script>
+        let dbContratista = {
+            razonSocial: "Constructora Vial del Centro S.A. de C.V.",
+            rfc: "CVC120304AB1",
+            estatus: "En revisión",
+            trabajadores: []
+        };
+
+        function switchTab(tabId) {
+            document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-blue-600', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-slate-600');
+            });
+            document.getElementById('btn-' + tabId).classList.add('border-blue-600', 'text-blue-600');
+            if(tabId === 'credenciales') renderCredenciales();
+        }
+
+        function guardarContratista(e) {
+            e.preventDefault();
+            dbContratista.razonSocial = document.getElementById('razon_social').value;
+            dbContratista.rfc = document.getElementById('rfc').value;
+            document.getElementById('admin-razon-social').innerText = dbContratista.razonSocial;
+            document.getElementById('admin-rfc').innerText = dbContratista.rfc;
+            alert("Datos guardados con éxito.");
+        }
+
+        function abrirModalTrabajador() { document.getElementById('modal-trabajador').classList.remove('hidden'); document.getElementById('modal-trabajador').classList.add('flex'); }
+        function cerrarModalTrabajador() { document.getElementById('modal-trabajador').classList.add('hidden'); document.getElementById('modal-trabajador').classList.remove('flex'); }
+
+        function guardarTrabajador(e) {
+            e.preventDefault();
+            dbContratista.trabajadores.push({
+                id: 'META-W-' + Math.floor(1000 + Math.random() * 9000),
+                nombre: document.getElementById('t_nombre').value,
+                nss: document.getElementById('t_nss').value,
+                puesto: document.getElementById('t_puesto').value
+            });
+            cerrarModalTrabajador();
+            document.getElementById('form-trabajador').reset();
+            renderTablas();
+        }
+
+        function renderTablas() {
+            const tbody = document.getElementById('tabla-trabajadores-body');
+            tbody.innerHTML = '';
+            if(dbContratista.trabajadores.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Sin trabajadores registrados.</td></tr>`;
+            } else {
+                dbContratista.trabajadores.forEach((t, idx) => {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3 font-semibold">${t.nombre}</td>
+                            <td class="p-3">${t.nss}</td>
+                            <td class="p-3">${t.puesto}</td>
+                            <td class="p-3"><span class="bg-emerald-100 text-emerald-700 text-xs px-2 py-0.5 rounded-full font-semibold">IMSS OK</span></td>
+                            <td class="p-3 text-center"><button onclick="dbContratista.trabajadores.splice(${idx},1);renderTablas();" class="text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button></td>
+                        </tr>
+                    `;
+                });
+            }
+            document.getElementById('resumen-total-personal').innerText = dbContratista.trabajadores.length + ' reg.';
+            document.getElementById('admin-total-personal').innerText = dbContratista.trabajadores.length + ' trabajadores';
+        }
+
+        function enviarRevision() { alert("Enviado a la Ing. Paulina Tellez para revisión HSE."); }
+
+        function aprobarContratista() {
+            dbContratista.estatus = "Aprobado";
+            document.getElementById('badge-estatus').innerText = "Aprobado";
+            document.getElementById('badge-estatus').className = "font-bold text-emerald-400";
+            document.getElementById('admin-badge').innerText = "Aprobado";
+            document.getElementById('admin-badge').className = "bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full text-xs font-semibold";
+            alert("Contratista aprobado. Credenciales activas.");
+        }
+
+        function rechazarContratista() {
+            dbContratista.estatus = "Rechazado";
+            document.getElementById('badge-estatus').innerText = "Rechazado";
+            document.getElementById('badge-estatus').className = "font-bold text-rose-400";
+            alert("Se notificaron observaciones.");
+        }
+
+        function renderCredenciales() {
+            const container = document.getElementById('contenedor-credenciales');
+            container.innerHTML = '';
+            if(dbContratista.estatus !== "Aprobado") {
+                container.innerHTML = `<div class="col-span-full p-6 text-center bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-sm">Las credenciales se habilitarán cuando la Ing. Paulina Tellez apruebe la empresa.</div>`;
+                return;
+            }
+            dbContratista.trabajadores.forEach((t, i) => {
+                const cardId = 'qr-' + i;
+                container.innerHTML += `
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm relative flex flex-col justify-between">
+                        <div class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl">META ACCESO</div>
+                        <div>
+                            <p class="text-xs text-blue-600 font-bold">${dbContratista.razonSocial}</p>
+                            <h4 class="text-lg font-bold text-slate-900 mt-1">${t.nombre}</h4>
+                            <p class="text-xs text-slate-500">Puesto: ${t.puesto}</p>
+                        </div>
+                        <div class="my-4 flex justify-center bg-slate-50 p-3 rounded-xl"><div id="${cardId}"></div></div>
+                        <div class="flex justify-between items-center text-[11px] text-slate-500 pt-3 border-t">
+                            <span>HSE: Ing. Paulina Tellez</span>
+                            <button onclick="seleccionarParaCaseta('${t.id}', '${t.nombre}')" class="text-blue-600 font-bold">Simular Caseta</button>
+                        </div>
+                    </div>
+                `;
+                setTimeout(() => new QRCode(document.getElementById(cardId), { text: t.id + "|" + t.nombre, width: 90, height: 90 }), 100);
+            });
+        }
+
+        let trabajadorSeleccionado = null;
+        function seleccionarParaCaseta(id, nombre) {
+            trabajadorSeleccionado = { id, nombre, empresa: dbContratista.razonSocial, estatus: dbContratista.estatus };
+            document.getElementById('input-qr-token').value = `Token: ${id} - ${nombre}`;
+            switchTab('caseta');
+        }
+
+        function escanearQR() {
+            const res = document.getElementById('resultado-escaneo');
+            res.classList.remove('hidden');
+            if(!trabajadorSeleccionado) {
+                res.className = "mt-6 p-4 bg-amber-50 border border-amber-200 text-amber-900 text-sm rounded-xl";
+                res.innerHTML = "Seleccione un trabajador desde la pestaña Credenciales.";
+                return;
+            }
+            res.className = "mt-6 p-6 rounded-2xl border bg-emerald-50 border-emerald-200 text-emerald-900";
+            res.innerHTML = `
+                <h3 class="font-bold text-lg mb-1"><i class="fa-solid fa-check mr-2"></i> ACCESO PERMITIDO</h3>
+                <p class="text-sm"><strong>Trabajador:</strong> ${trabajadorSeleccionado.nombre}</p>
+                <p class="text-sm"><strong>Empresa:</strong> ${trabajadorSeleccionado.empresa}</p>
+                <p class="text-xs text-emerald-700 mt-2">Autorizado por: Ing. Paulina Tellez</p>
+            `;
+        }
+    </script>
+</body>
+</html>
